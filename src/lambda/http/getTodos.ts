@@ -10,6 +10,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   
   console.log('Getting all todo items via DocumentClient.scan()', event)
   
+  // FIXME: add filterig for only the current user's ID (to be implemented AFTER auth)
   const response = await docClient.scan({
     TableName: todosTable
   }).promise()
