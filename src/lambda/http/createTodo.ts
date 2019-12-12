@@ -6,20 +6,23 @@ import * as uuid from 'uuid'
 
 const docClient = new DocumentClient()
 const todosTable = process.env.TODOS_TABLE
+const imagesBucket = process.env.TODO_IMAGES_S3_BUCKET
+const awsRegion = process.env.AWS_REGION
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   
   console.log('Posting new TODO based on event:', event.body)
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
+  const todoId = uuid.v4()
 
   const todoItem = {
     // FIXME: correct object userId property
     userId: uuid.v4(),
     createdAt: new Date().toISOString(),
-    todoId: uuid.v4(),
+    todoId,
     ...newTodo,
     done: false,
-    attachmentUrl: '<URL to be inserted>' // FIXME: URL to be added
+    attachmentUrl: `https://${imagesBucket}.s3.${awsRegion}.amazonaws.com/${todoId}_image`
   }
 
   await docClient.put({
