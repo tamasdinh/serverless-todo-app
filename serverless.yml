@@ -4,8 +4,8 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
-  - serverless-dynamodb-local
-  - serverless-offline
+  # - serverless-dynamodb-local
+  # - serverless-offline
 
 provider:
   name: aws
@@ -15,17 +15,17 @@ provider:
   region: ${opt:region, 'us-east-1'}
 
   environment:
-    AWS_REGION: ${self:provider.region}
+    REGION: ${self:provider.region}
     TODOS_TABLE: Todos-${self:provider.stage}
     TODO_ID_INDEX: todoId
-    TODO_IMAGES_S3_BUCKET: Todos-images-${self:provider.stage}
+    TODO_IMAGES_S3_BUCKET: todos-images-${self:provider.stage}
     IMAGE_URL_EXPIRATION: 300
     TODOS_SECONDARY_INDEX: userId
 
 custom:
-  dynamodb:
-    stages:
-      - dev
+  # dynamodb: # for dynamodb-local
+  #   stages:
+  #     - dev
 
 functions:
 
@@ -82,13 +82,12 @@ functions:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
-  # TODO: Configure this function
-  # GenerateUploadUrl:
-  #   handler: src/lambda/http/generateUploadUrl.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos/{todoId}/attachment
+  GenerateUploadUrl:
+    handler: src/lambda/http/generateUploadUrl.handler
+    events:
+      - http:
+          method: post
+          path: todos/{todoId}/attachment
 
 resources:
   Resources:

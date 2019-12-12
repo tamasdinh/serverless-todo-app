@@ -7,7 +7,7 @@ import * as uuid from 'uuid'
 const docClient = new DocumentClient()
 const todosTable = process.env.TODOS_TABLE
 const imagesBucket = process.env.TODO_IMAGES_S3_BUCKET
-const awsRegion = process.env.AWS_REGION
+const awsRegion = process.env.REGION
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   
@@ -35,7 +35,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     headers: {},
     body: JSON.stringify({
       item: {
-        todoItem
+        ...todoItem
       }
     })
   }
