@@ -30,6 +30,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   return {
     statusCode: 201,
     headers: {},
-    body: JSON.stringify(todoItem)
+    body: JSON.stringify({
+      item: {
+        todoItem
+      }
+    })
   }
 }
