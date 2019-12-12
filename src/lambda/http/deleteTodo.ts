@@ -26,7 +26,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   
   return {
     statusCode: 201,
-    headers: {},
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
     body: JSON.stringify({
       message: `Todo w/ID ${todoId} successfully deleted.`,
       todo_deleted: itemToDelete.Items[0]

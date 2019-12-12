@@ -36,8 +36,10 @@ functions:
     handler: src/lambda/http/getTodos.handler
     events:
       - http:
+          # authorizer: Auth
           method: get
           path: todos
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -48,8 +50,10 @@ functions:
     handler: src/lambda/http/createTodo.handler
     events:
       - http:
+          # authorizer: Auth
           method: post
           path: todos
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -60,8 +64,10 @@ functions:
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
+          # authorizer: Auth
           method: patch
           path: todos/{todoId}
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -73,8 +79,10 @@ functions:
     handler: src/lambda/http/deleteTodo.handler
     events:
       - http:
+          # authorizer: Auth
           method: delete
           path: todos/{todoId}
+          cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -86,11 +94,29 @@ functions:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
       - http:
+          # authorizer: Auth
           method: post
           path: todos/{todoId}/attachment
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: 'arn:aws:s3:::${self:provider.environment.TODO_IMAGES_S3_BUCKET}/*'
 
 resources:
   Resources:
+
+    GatewayResponseDefault4xx:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PATCH,DELETE,OPTIONS'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
     
     TodosDynamoDBTable:
       Type: "AWS::DynamoDB::Table"
@@ -123,20 +149,20 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.TODO_IMAGES_S3_BUCKET}
-        # CorsConfiguration:
-        #   CorsRules:
-        #     -
-        #       AllowedOrigins:
-        #         - '*'
-        #       AllowedHeaders:
-        #         - '*'
-        #       AllowedMethods:
-        #         - GET
-        #         - PUT
-        #         - POST
-        #         - DELETE
-        #         - HEAD
-        #       MaxAge: 3000
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
 
     BucketPolicy:
       Type: AWS::S3::BucketPolicy
