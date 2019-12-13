@@ -1,22 +1,18 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
+import fetch from 'node-fetch'
+import { decode, verify } from 'jsonwebtoken'
+import * as jwkToPem from 'jwk-to-pem'
 
-import { verify, decode } from 'jsonwebtoken'
 import { createLogger } from '../../utils/logger'
-import Axios from 'axios'
 import { Jwt } from '../../auth/Jwt'
 import { JwtPayload } from '../../auth/JwtPayload'
 
 const logger = createLogger('auth')
 
-// TODO: Provide a URL that can be used to download a certificate that can be used
-// to verify JWT token signature.
-// To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-const jwksUrl = '...'
+const jwksUrl = 'https://td-dev2019.eu.auth0.com/.well-known/jwks.json'
 
-export const handler = async (
-  event: CustomAuthorizerEvent
-): Promise<CustomAuthorizerResult> => {
+export const handler = async (event: CustomAuthorizerEvent): Promise<CustomAuthorizerResult> => {
   logger.info('Authorizing a user', event.authorizationToken)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
@@ -58,10 +54,17 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const token = getToken(authHeader)
   const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
-  // TODO: Implement token verification
-  // You should implement it similarly to how it was implemented for the exercise for the lesson 5
-  // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return undefined
+  if (jwt.header.typ !== 'JWT') throw new Error('Token is not a JSON Web Token')
+  if (jwt.header.alg !== 'RS256') throw new Error('Token is not RS256')
+
+  await fetch(jwksUrl)
+  .then(res => res.json())
+  .then(res => (
+    res.keys.find(item => item.alg === jwt.header.alg && item.kid === jwt.header.kid)
+  ))
+  .then(auth0Key => verify(token, jwkToPem(auth0Key), {algorithms: ['RS256']}))
+
+  return jwt.payload
 }
 
 function getToken(authHeader: string): string {
