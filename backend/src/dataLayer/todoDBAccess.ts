@@ -1,4 +1,5 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import { TodoItem } from '../models/TodoItem'
 
 export class todoDBAccess {
 
@@ -20,6 +21,13 @@ export class todoDBAccess {
     }).promise()
     
     return response.Items
+  }
+
+  async createTodo(todoItem: TodoItem) {
+    await this.docClient.put({
+      TableName: this.todosTable,
+      Item: todoItem
+    }).promise()
   }
 
 }
