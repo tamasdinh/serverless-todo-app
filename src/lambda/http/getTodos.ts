@@ -1,18 +1,25 @@
 import 'source-map-support/register'
-
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
 import * as AWS from 'aws-sdk'
+import { getUserId } from '../utils'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
+const userIndex = process.env.TODOS_SECONDARY_INDEX
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   
   console.log('Getting all todo items via DocumentClient.scan()', event)
+
+  const userId = getUserId(event)
   
-  // FIXME: add filterig for only the current user's ID (to be implemented AFTER auth)
-  const response = await docClient.scan({
-    TableName: todosTable
+  const response = await docClient.query({
+    TableName: todosTable,
+    IndexName: userIndex,
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': userId
+    }
   }).promise()
 
   return {

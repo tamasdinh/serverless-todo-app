@@ -3,6 +3,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } f
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import * as uuid from 'uuid'
+import { getUserId } from '../utils'
 
 const docClient = new DocumentClient()
 const todosTable = process.env.TODOS_TABLE
@@ -13,11 +14,11 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   
   console.log('Posting new TODO based on event:', event.body)
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
+  const userId = getUserId(event)
   const todoId = uuid.v4()
 
   const todoItem = {
-    // FIXME: correct object userId property
-    userId: uuid.v4(),
+    userId,
     createdAt: new Date().toISOString(),
     todoId,
     ...newTodo,
