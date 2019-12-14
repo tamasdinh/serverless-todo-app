@@ -46,15 +46,16 @@ functions:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/*
   
-  TodoDBAccess:
-    handler: src/dataLayer/todoDBAccess.handler
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-          - dynamodb:PutItem
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+  # TodoDBAccess:
+  #   handler: src/dataLayer/todoDBAccess.handler
+  #   iamRoleStatements:
+  #     - Effect: Allow
+  #       Action:
+  #         - dynamodb:Query
+  #         - dynamodb:PutItem
+  #         - dynamodb:UpdateItem
+  #         - dynamodb:DeleteItem
+  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -99,7 +100,7 @@ functions:
           - dynamodb:DeleteItem
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-
+  
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:

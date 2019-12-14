@@ -57,4 +57,23 @@ export class todoDBAccess {
 
   }
 
+  async deleteTodo(todoId: string): Promise<void> {
+
+    const itemToDelete = await this.docClient.query({
+      TableName: this.todosTable,
+      KeyConditionExpression: 'todoId = :todoId',
+      ExpressionAttributeValues: {
+        ':todoId': todoId
+      }
+    }).promise()
+   
+    await this.docClient.delete({
+      TableName: this.todosTable,
+      Key: {
+        todoId,
+        createdAt: itemToDelete.Items[0].createdAt
+      }
+    }).promise()
+  }
+
 }
