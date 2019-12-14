@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "create-todo",
+  "type": "object",
+  "properties": {
+    "todo": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "todo",
+    "dueDate"
+  ],
+  "additionalProperties": false
+}
