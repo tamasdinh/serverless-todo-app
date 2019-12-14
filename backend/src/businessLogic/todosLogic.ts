@@ -40,7 +40,7 @@ export async function deleteTodo(todoId: string): Promise<void> {
   return await DB.deleteTodo(todoId)
 }
 
-export async function getSignedUrl(todoId: string): Promise<string> {
-  return await S3Handler.getSignedUrl(todoId)
+export function getSignedUrl(todoId: string): string {
+  return S3Handler.getSignedUrl(todoId)
 }
 

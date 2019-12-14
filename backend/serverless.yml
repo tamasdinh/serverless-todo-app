@@ -46,17 +46,6 @@ functions:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/*
   
-  # TodoDBAccess:
-  #   handler: src/dataLayer/todoDBAccess.handler
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #         - dynamodb:Query
-  #         - dynamodb:PutItem
-  #         - dynamodb:UpdateItem
-  #         - dynamodb:DeleteItem
-  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:

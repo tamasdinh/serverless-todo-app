@@ -10,12 +10,11 @@ export class todoS3Access {
     private readonly urlExpiration: number = Number(process.env.IMAGE_URL_EXPIRATION)
   ){}
 
-  async getSignedUrl(todoId: string): Promise<string> {
+  getSignedUrl(todoId: string): string {
     return this.s3.getSignedUrl('putObject', {
       Bucket: this.todoImagesBucket,
       Key: todoId,
       Expires: this.urlExpiration
     })
-
   }
 }
